@@ -1,50 +1,62 @@
-﻿string[] data = File.ReadAllLines("data.txt");
+﻿StreamReader sr = new StreamReader("data.txt");
+int maxRed = 12;
+int maxGreen = 13;
+int maxBlue = 14;
+
 int sum = 0;
 
-foreach (string line in data)
+while (!sr.EndOfStream)
 {
-    int red = 0;
-    int blue = 0;
-    int green = 0;
-    string[] firstSplit = line.Split(':');
-    int gameNumber = GetDigits(firstSplit[0]);
-    Console.Write($"game {gameNumber}: ");
+    string line = sr.ReadLine();
 
-    string[] secondSplit = firstSplit[1].Split(';');
-    for (int i = 0; i < secondSplit.Length; i++)
+    string[] firstSplit = line.Split(": ");
+
+    int gameNr = int.Parse(firstSplit[0].Split(' ')[1]);
+
+    string[] secondSplit = firstSplit[1].Split("; ");
+
+    bool impossible = false;
+
+    foreach (string s in secondSplit)
     {
-        string[] thirdSplit = secondSplit[i].Split(',');
-        for (int j = 0; j < thirdSplit.Length; j++)
+        string[] thirdSplit = s.Split(", ");
+
+        foreach (string s2 in thirdSplit)
         {
-            switch (thirdSplit[j])
+            if (s2.Contains("red"))
             {
-                case string a when a.Contains("red"):
-                    red += GetDigits(thirdSplit[j]);
-                    break;
-                case string b when b.Contains("green"):
-                    green += GetDigits(thirdSplit[j]);
-                    break;
-                case string c when c.Contains("blue"):
-                    blue += GetDigits(thirdSplit[j]);
-                    break;
+                int sumRed = int.Parse(s2.Split(' ')[0]);
+
+                if (sumRed > maxRed)
+                {
+                    impossible = true;
+                }
+            }
+            else if (s2.Contains("green"))
+            {
+                int sumGreen = int.Parse(s2.Split(' ')[0]);
+
+                if (sumGreen > maxGreen)
+                {
+                    impossible = true;
+                }
+            }
+            else if (s2.Contains("blue"))
+            {
+                int sumBlue = int.Parse(s2.Split(' ')[0]);
+
+                if (sumBlue > maxBlue)
+                {
+                    impossible = true;
+                }
             }
         }
     }
 
-    Console.WriteLine($"red: {red}, blue: {blue}, green {green}");
-    if (red < 13 && green < 14 && blue < 15)
+    if (impossible == false)
     {
-        sum += gameNumber;
+        sum += gameNr;
     }
 }
 
 Console.WriteLine(sum);
-
-
-
-static int GetDigits(string input)
-{
-    string digits = new string(input.Where(c => char.IsDigit(c)).ToArray());
-    int output = int.Parse(digits);
-    return output;
-}
