@@ -1,62 +1,48 @@
-﻿StreamReader sr = new StreamReader("data.txt");
-int maxRed = 12;
-int maxGreen = 13;
-int maxBlue = 14;
+﻿using System.Runtime.CompilerServices;
+
+string[] input = File.ReadAllLines("data.txt");
 
 int sum = 0;
 
-while (!sr.EndOfStream)
+for (int i = 0; i < input.Length; i++)
 {
-    string line = sr.ReadLine();
+    bool possible = true;
+    int currentGame = i + 1;
+    string[] firstSplit = input[i].Split(':')[1].Split(';');
 
-    string[] firstSplit = line.Split(": ");
-
-    int gameNr = int.Parse(firstSplit[0].Split(' ')[1]);
-
-    string[] secondSplit = firstSplit[1].Split("; ");
-
-    bool impossible = false;
-
-    foreach (string s in secondSplit)
+    for (int j = 0; j < firstSplit.Length; j++)
     {
-        string[] thirdSplit = s.Split(", ");
+        string[] secondSplit = firstSplit[j].Split(',');
 
-        foreach (string s2 in thirdSplit)
+        for (int k = 0; k < secondSplit.Length; k++)
         {
-            if (s2.Contains("red"))
+            int cubeAmount = GetDigit(secondSplit[k]);
+            if (secondSplit[k].Contains("red") && cubeAmount > 12)
             {
-                int sumRed = int.Parse(s2.Split(' ')[0]);
-
-                if (sumRed > maxRed)
-                {
-                    impossible = true;
-                }
+                possible = false;
             }
-            else if (s2.Contains("green"))
+            else if (secondSplit[k].Contains("green") && cubeAmount > 13)
             {
-                int sumGreen = int.Parse(s2.Split(' ')[0]);
-
-                if (sumGreen > maxGreen)
-                {
-                    impossible = true;
-                }
+                possible = false;
             }
-            else if (s2.Contains("blue"))
+            else if (secondSplit[k].Contains("blue") && cubeAmount > 14)
             {
-                int sumBlue = int.Parse(s2.Split(' ')[0]);
-
-                if (sumBlue > maxBlue)
-                {
-                    impossible = true;
-                }
+                possible = false;
             }
         }
     }
 
-    if (impossible == false)
+    if (possible)
     {
-        sum += gameNr;
+        sum += currentGame;
     }
 }
 
 Console.WriteLine(sum);
+
+static int GetDigit(string input)
+{
+    string digits = new string(input.Where(c => char.IsDigit(c)).ToArray());
+    int output = int.Parse(digits);
+    return output;
+}
