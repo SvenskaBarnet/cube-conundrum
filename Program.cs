@@ -1,62 +1,40 @@
-﻿StreamReader sr = new StreamReader("data.txt");
-int maxRed = 12;
-int maxGreen = 13;
-int maxBlue = 14;
-
+﻿string[] input = File.ReadAllLines("data.txt");
 int sum = 0;
 
-while (!sr.EndOfStream)
+foreach (string line in input)
 {
-    string line = sr.ReadLine();
-
-    string[] firstSplit = line.Split(": ");
-
-    int gameNr = int.Parse(firstSplit[0].Split(' ')[1]);
-
-    string[] secondSplit = firstSplit[1].Split("; ");
-
-    bool impossible = false;
-
-    foreach (string s in secondSplit)
+    int maxGreen = 0;
+    int maxRed = 0;
+    int maxBlue = 0;
+    string[] firstSplit = line.Split(':')[1].Split(';');
+    foreach (string game in firstSplit)
     {
-        string[] thirdSplit = s.Split(", ");
-
-        foreach (string s2 in thirdSplit)
+        string[] secondSplit = game.Split(',');
+        foreach (string set in secondSplit)
         {
-            if (s2.Contains("red"))
+            int cubeAmount = GetDigits(set);
+            if (set.Contains("red") && cubeAmount > maxRed)
             {
-                int sumRed = int.Parse(s2.Split(' ')[0]);
-
-                if (sumRed > maxRed)
-                {
-                    impossible = true;
-                }
+                maxRed = cubeAmount;
             }
-            else if (s2.Contains("green"))
+            if (set.Contains("green") && cubeAmount > maxGreen)
             {
-                int sumGreen = int.Parse(s2.Split(' ')[0]);
-
-                if (sumGreen > maxGreen)
-                {
-                    impossible = true;
-                }
+                maxGreen = cubeAmount;
             }
-            else if (s2.Contains("blue"))
+            if (set.Contains("blue") && cubeAmount > maxBlue)
             {
-                int sumBlue = int.Parse(s2.Split(' ')[0]);
-
-                if (sumBlue > maxBlue)
-                {
-                    impossible = true;
-                }
+                maxBlue = cubeAmount;
             }
         }
     }
-
-    if (impossible == false)
-    {
-        sum += gameNr;
-    }
+    sum += maxRed * maxGreen * maxBlue;
 }
 
 Console.WriteLine(sum);
+
+static int GetDigits(string input)
+{
+    string digits = new string(input.Where(char.IsDigit).ToArray());
+    int output = int.Parse(digits);
+    return output;
+}
